@@ -20,8 +20,6 @@ jobs:
 
             - name: Copy config to source code
               run: |
-                  sed -i '$a src-git kenzo https://github.com/kenzok8/openwrt-packages' feeds.conf.default
-                  sed -i '$a src-git small https://github.com/kenzok8/small' feeds.conf.default
                   cp -f .config feeds.conf.default diy.sh $REPO_NAME/
 
             - name: Get the dependency of immortalwrtARM
