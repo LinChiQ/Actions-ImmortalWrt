@@ -5,7 +5,7 @@ on:
 
 env:
     CLONE_COMMAND: git clone --depth=1 https://github.com/hanwckf/immortalwrt-mt798x.git
-    REPO_NAME: immortalwrt-798x
+    REPO_NAME: immortalwrt-mt798x
 
 jobs:
     build:
