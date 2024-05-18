@@ -5,7 +5,7 @@ on:
 
 env:
     CLONE_COMMAND: git clone --depth=1 https://github.com/hanwckf/immortalwrt-mt798x.git
-    REPO_NAME: immortalwrt-mt798x
+    REPO_NAME: immortalwrtARM
 
 jobs:
     build:
@@ -20,15 +20,11 @@ jobs:
 
             - name: Copy config to source code
               run: |
-                  docker rmi `docker images -q`
-                  sudo rm -rf /etc/apt/sources.list.d/* /usr/share/dotnet /usr/local/lib/android /opt/ghc /etc/mysql /etc/php
-                  sudo -E apt-get -y purge azure-cli* docker* ghc* zulu* hhvm* llvm* firefox* google* dotnet* aspnetcore* powershell* openjdk* adoptopenjdk* mysql* php* mongodb* moby* snap* || true
-                  sudo -E apt-get -y update
-                  sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.eu.org/init_build_environment.sh)'
-                  sudo -E apt-get -qq autoremove --purge
-                  sudo -E apt-get -qq clean
-                  sudo timedatectl set-timezone Asia/Shanghai
                   cp -f .config feeds.conf.default diy.sh $REPO_NAME/
+
+            - name: Install the software packages required for compilation
+              run: |
+                  sudo bash -c 'bash <(curl -s https://build-scripts.immortalwrt.eu.org/init_build_environment.sh)'
 
             - name: Get the dependency of immortalwrtARM
               run: |
@@ -50,7 +46,7 @@ jobs:
             - name: Build immortalwrtARM
               run: |
                   cd $REPO_NAME
-                  make -j$(nproc) V=s
+                  make -j$(nproc)
                   pwd
                   ls
 # 默认make -j$(nproc)，代表多线程编译。如果求稳想看报错信息，可以使用make -j1 V=99代替
