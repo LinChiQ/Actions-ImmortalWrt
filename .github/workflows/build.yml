@@ -16,9 +16,7 @@ jobs:
 
             - name: Clone immortalwrtARM repo
               run: |
-                  wget https://github.com/hanwckf/immortalwrt-mt798x/archive/032821b7afbef9499495f8054c237f4e8e0d230f.zip
-                  unzip 032821b7afbef9499495f8054c237f4e8e0d230f.zip
-                  mv immortalwrt-mt798x-032821b7afbef9499495f8054c237f4e8e0d230f immortalwrt-mt798x
+                  $CLONE_COMMAND
 
             - name: Copy config to source code
               run: |
