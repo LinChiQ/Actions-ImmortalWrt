@@ -24,6 +24,8 @@ jobs:
 
             - name: Install the software packages required for compilation
               run: |
+                  sudo apt update && sudo apt upgrade
+                  sudo apt-get install build-essential libssl-dev libz-dev
                   wget https://build-scripts.immortalwrt.eu.org/init_build_environment.sh && chmod +x init_build_environment.sh && sudo bash init_build_environment.sh 
 
             - name: Get the dependency of immortalwrtARM
