@@ -27,34 +27,8 @@ jobs:
                   sudo apt update && sudo apt upgrade -y
                   sudo apt-get install -y build-essential libssl-dev libz-dev wget
 
-            - name: Set up ccache
-              run: |
-                  sudo apt-get install -y ccache
-                  export CCACHE_DIR=$HOME/.ccache
-                  echo "export CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
-                  ccache --max-size=5G
-                  export PATH="/usr/lib/ccache:$PATH"
-                  echo "export PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
-                  ccache -s
-
-            - name: Add repository for GCC 8
-              run: |
-                  sudo add-apt-repository ppa:ubuntu-toolchain-r/test
-                  sudo apt-get update
-
-            - name: Install GCC 8
-              run: |
-                  sudo apt-get install -y gcc-8 g++-8
-                  sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80
-                  sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 80
-                  sudo update-alternatives --set gcc /usr/bin/gcc-8
-                  sudo update-alternatives --set g++ /usr/bin/g++-8
-                  gcc --version
-                  g++ --version
-
             - name: Modify .config for ccache and GCC version
               run: |
-                  echo "CONFIG_CCACHE=y" >> $REPO_NAME/.config
                   echo "CONFIG_SDK_GCC_VERSION=\"8.x\"" >> $REPO_NAME/.config
 
             - name: Get the dependency of immortalwrtARM
