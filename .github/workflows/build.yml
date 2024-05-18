@@ -27,9 +27,9 @@ jobs:
                   sudo apt update && sudo apt upgrade -y
                   sudo apt-get install -y build-essential libssl-dev libz-dev wget
 
-            - name: Modify .config for ccache and GCC version
+            - name: Modify .config for GCC version
               run: |
-                  echo "CONFIG_SDK_GCC_VERSION=\"8.x\"" >> $REPO_NAME/.config
+                  echo 'CONFIG_SDK_GCC_VERSION="8.x"' >> $REPO_NAME/.config
 
             - name: Get the dependency of immortalwrtARM
               run: |
@@ -48,10 +48,7 @@ jobs:
               run: |
                   cd $REPO_NAME
                   make defconfig
-                  make -j1 V=99"
-                  pwd
-                  ls
-# 默认make -j$(nproc)，代表多线程编译。如果求稳想看报错信息，可以使用make -j1 V=99代替
+                  make -j1 V=99
 
             - name: Move results to root
               run: |
