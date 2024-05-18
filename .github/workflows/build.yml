@@ -33,10 +33,6 @@ jobs:
                   ./diy.sh
                   ./scripts/feeds update -a && ./scripts/feeds install -a
 
-            - name: Copy config to source code
-              run: |
-                  cp -f .config feeds.conf.default diy.sh $REPO_NAME/
-
             - name: Upload config before build
               uses: actions/upload-artifact@v3
               with:
