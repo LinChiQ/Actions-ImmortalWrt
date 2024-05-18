@@ -4,14 +4,14 @@ on:
     workflow_dispatch:
 
 env:
-    CLONE_COMMAND: git clone --depth=1 https://github.com/hanwckf/immortalwrt-mt798x.git
-    REPO_NAME: immortalwrt-mt798x
+    CLONE_COMMAND: git clone -b mt7986 --depth 1 https://github.com/padavanonly/immortalwrtARM
+    REPO_NAME: immortalwrtARM
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout code
+            - name: Clone from github
               uses: actions/checkout@v3
 
             - name: Clone immortalwrtARM repo
@@ -24,12 +24,7 @@ jobs:
 
             - name: Install the software packages required for compilation
               run: |
-                  sudo apt update && sudo apt upgrade -y
-                  sudo apt-get install -y build-essential libssl-dev libz-dev wget
-
-            - name: Modify .config for GCC version
-              run: |
-                  echo 'CONFIG_SDK_GCC_VERSION="8.x"' >> $REPO_NAME/.config
+                  sudo bash -c 'bash <(curl -sL https://build-scripts.immortalwrt.eu.org/init_build_environment.sh)'
 
             - name: Get the dependency of immortalwrtARM
               run: |
@@ -37,6 +32,11 @@ jobs:
                   chmod +x diy.sh
                   ./diy.sh
                   ./scripts/feeds update -a && ./scripts/feeds install -a
+
+            - name: Copy config to source code
+              run: |
+                  cp -f .config feeds.conf.default diy.sh $REPO_NAME/
+                  echo 'CONFIG_SDK_GCC_VERSION="8.x"' >> $REPO_NAME/.config
 
             - name: Upload config before build
               uses: actions/upload-artifact@v3
@@ -47,8 +47,8 @@ jobs:
             - name: Build immortalwrtARM
               run: |
                   cd $REPO_NAME
-                  make defconfig
-                  make -j1 V=99
+                  make -j$(nproc)
+# 默认make -j$(nproc)，代表多线程编译。如果求稳想看报错信息，可以使用make -j1 V=99代替
 
             - name: Move results to root
               run: |
