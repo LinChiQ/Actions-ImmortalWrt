@@ -11,7 +11,7 @@ jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            - name: Clone from github
+            - name: Checkout code
               uses: actions/checkout@v3
 
             - name: Clone immortalwrtARM repo
@@ -24,9 +24,33 @@ jobs:
 
             - name: Install the software packages required for compilation
               run: |
-                  sudo apt update && sudo apt upgrade
-                  sudo apt-get install build-essential libssl-dev libz-dev
-                  wget https://build-scripts.immortalwrt.eu.org/init_build_environment.sh && chmod +x init_build_environment.sh && sudo bash init_build_environment.sh 
+                  sudo apt update && sudo apt upgrade -y
+                  sudo apt-get install -y build-essential libssl-dev libz-dev wget
+
+            - name: Set up ccache
+              run: |
+                  sudo apt-get install -y ccache
+                  export CCACHE_DIR=$HOME/.ccache
+                  echo "export CCACHE_DIR=$HOME/.ccache" >> $GITHUB_ENV
+                  ccache --max-size=5G
+                  export PATH="/usr/lib/ccache:$PATH"
+                  echo "export PATH=/usr/lib/ccache:$PATH" >> $GITHUB_ENV
+                  ccache -s
+
+            - name: Install GCC 8
+              run: |
+                  sudo apt-get install -y gcc-8 g++-8
+                  sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 80
+                  sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-8 80
+                  sudo update-alternatives --set gcc /usr/bin/gcc-8
+                  sudo update-alternatives --set g++ /usr/bin/g++-8
+                  gcc --version
+                  g++ --version
+
+            - name: Modify .config for ccache and GCC version
+              run: |
+                  echo "CONFIG_CCACHE=y" >> $REPO_NAME/.config
+                  echo "CONFIG_SDK_GCC_VERSION=\"8.x\"" >> $REPO_NAME/.config
 
             - name: Get the dependency of immortalwrtARM
               run: |
@@ -44,7 +68,8 @@ jobs:
             - name: Build immortalwrtARM
               run: |
                   cd $REPO_NAME
-                  make -j1 V=s
+                  make defconfig
+                  make -j$(nproc) CC="ccache gcc" CXX="ccache g++"
                   pwd
                   ls
 # 默认make -j$(nproc)，代表多线程编译。如果求稳想看报错信息，可以使用make -j1 V=99代替
